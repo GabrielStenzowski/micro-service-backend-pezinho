@@ -1,0 +1,19 @@
+version: '4.0'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: pezinho_database
+    restart: always
+    environment:
+      MYSQL_DATABASE: db_pezinho
+      MYSQL_USER: docker
+      MYSQL_ROOT_PASSWORD: 'dockerdocker'
+      MYSQL_PASSWORD: 'dockerdocker'
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
