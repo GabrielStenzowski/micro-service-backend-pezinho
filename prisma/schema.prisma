@@ -20,4 +20,96 @@ model User {
   date_birth    DateTime
   gender        TypeGender
   created_at    DateTime    @default(now())
+
+  BankAccount BankAccount[] @relation("UserAccounts")
+
+  Card Card[]
+
+  FinancialGoal FinancialGoal[]
+
+  Transaction Transaction[]
+
+  @@map("user")
+}
+
+model BankAccount {
+  id            String @id @default(uuid())
+  userId        String @map("user_id")
+  accountName   String @map("name_account")
+  accountType   String @map("type_account")
+  bankBalance   String @map("bank_balance")
+
+
+  user User @relation("UserAccounts", fields: [userId], references: [id])
+  typeAccount TypeAccount @relation("AccountType", fields: [accountType], references: [id])
+  Transaction Transaction[]
+
+  @@map("bank_account")
+}
+
+model TypeAccount {
+  id             String @id @default(uuid())
+  type           String @map("type")
+
+  UserBankingAccount BankAccount[] @relation("AccountType")
+
+  @@map("type_account")
+}
+
+
+model Card {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  cardName        String   @map("card_name")
+  cardType        CardType
+  limitAmount     Decimal? @map("limit_amount") 
+  currentBalance  Decimal  @default(0.00) @map("current_balance")
+  dueDate         Int?     @map("due_date") 
+
+  user User @relation(fields: [userId], references: [id])
+  Transaction Transaction[]
+
+  @@map("card")
+}
+
+enum CardType {
+  CREDIT
+  DEBIT
+}
+
+model FinancialGoal {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  title         String
+  description   String?
+  targetAmount  Decimal  @map("target_amount")
+  currentAmount Decimal  @default(0.00) @map("current_amount")
+  deadline      DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("financial_goal")
+}
+
+
+model Transaction {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  accountId       String?  @map("account_id")
+  cardId          String?  @map("card_id")
+  amount          Decimal
+  type            TransactionType
+  description     String?
+  date            DateTime @default(now())
+
+  user    User               @relation(fields: [userId], references: [id])
+  account BankAccount? @relation(fields: [accountId], references: [id])
+  card    Card?              @relation(fields: [cardId], references: [id])
+
+  @@map("transaction")
+}
+
+enum TransactionType {
+  INCOME   
+  EXPENSE  
 }
