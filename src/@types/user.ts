@@ -15,3 +15,8 @@ export type UpdatePasswordProps = {
   userId: string
   newPassword: string
 }
+
+export type AutheticateUserProps = {
+  email: string
+  password: string
+}

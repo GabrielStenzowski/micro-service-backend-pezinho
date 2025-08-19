@@ -1,12 +1,12 @@
 import { TypeGender } from '@/@types/user'
 import { UsersErrors } from '@/use-cases/errors/users-errror'
-import { makeCreateUserUserCase } from '@/use-cases/factories/create-user-use-case'
+import { makeCreateUserUseCase } from '@/use-cases/factories/create-user-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import z from 'zod'
 
 class CreateUserController {
   async handle(request: FastifyRequest, reply: FastifyReply) {
-    const createUserUseCase = makeCreateUserUserCase()
+    const createUserUseCase = makeCreateUserUseCase()
 
     const createUserBodySchema = z.object({
       name: z.string(),
