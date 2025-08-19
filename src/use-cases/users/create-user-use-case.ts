@@ -3,12 +3,13 @@ import { IUserRepository } from '@/repositories/i-users-repository'
 import { User } from '@prisma/client'
 import { hash } from 'bcryptjs'
 import { UsersErrors } from '../errors/users-errror'
+import { UsersSucess } from '../sucess/users-sucess'
 export class CreateUserUseCase {
   constructor(private usersRepository: IUserRepository) {
     this.usersRepository = usersRepository
   }
 
-  async execute(data: CreateUserProps): Promise<User> {
+  async execute(data: CreateUserProps) {
     const password_hash = await hash(data.password, 6)
 
     const userWithSameEmail = await this.usersRepository.findByEmail(data.email)
@@ -21,13 +22,13 @@ export class CreateUserUseCase {
       )
     }
 
-    const createdUser = await this.usersRepository.createUser({
+    await this.usersRepository.createUser({
       name: data.name,
       email: data.email,
       password: password_hash,
       dateOfBirth: new Date(data.dateOfBirth),
       gender: data.gender,
     })
-    return createdUser
+    return new UsersSucess('User created', 201, 'Usuário criado com sucesso')
   }
 }

@@ -12,13 +12,13 @@ class CreateUserController {
       name: z.string(),
       email: z.string().email(),
       password: z.string(),
-      dateOfBirth: z.date(),
+      dateOfBirth: z.coerce.date(),
       gender: z.nativeEnum(TypeGender),
     })
     const { name, email, password, dateOfBirth, gender } =
       createUserBodySchema.parse(request.body)
     try {
-      await createUserUseCase.execute({
+      const result = await createUserUseCase.execute({
         name,
         email,
         password,
@@ -26,10 +26,15 @@ class CreateUserController {
         gender,
       })
 
-      return reply.status(201).send()
+      return reply.status(result.successCode).send({
+        successType: result.success,
+        message: result.sucessMessage,
+      })
     } catch (error: any) {
       if (error instanceof UsersErrors) {
-        return reply.status(400).send({ message: error.message })
+        return reply
+          .status(error.errorCode)
+          .send({ errorType: error.error, message: error.message })
       }
     }
   }
