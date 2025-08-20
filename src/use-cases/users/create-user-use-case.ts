@@ -1,6 +1,5 @@
 import { CreateUserProps } from '@/@types/user'
 import { IUserRepository } from '@/repositories/i-users-repository'
-import { User } from '@prisma/client'
 import { hash } from 'bcryptjs'
 import { UsersErrors } from '../errors/users-errror'
 import { UsersSucess } from '../sucess/users-sucess'

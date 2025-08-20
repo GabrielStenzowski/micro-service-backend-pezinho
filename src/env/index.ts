@@ -6,8 +6,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string(),
   PORT: z.coerce.number().default(3333),
   JWT_SECRET: z.string(),
-  EXPERES_IN_REFRESH_TOKEN: z.string(),
-  EXPERES_IN_TOKEN: z.string(),
+  EXPIRES_IN_REFRESH_TOKEN: z.string(),
+  EXPIRES_IN_TOKEN: z.string(),
 })
 
 const _env = envSchema.safeParse(process.env)

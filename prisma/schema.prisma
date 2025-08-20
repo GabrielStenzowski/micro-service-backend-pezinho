@@ -37,7 +37,7 @@ model BankAccount {
   userId        String @map("user_id")
   accountName   String @map("name_account")
   accountType   String @map("type_account")
-  bankBalance   String @map("bank_balance")
+  bankBalance   Decimal  @map("bank_balance") @db.Decimal(15,2)
 
 
   user User @relation("UserAccounts", fields: [userId], references: [id])
@@ -45,13 +45,14 @@ model BankAccount {
   Transaction Transaction[]
 
   @@map("bank_account")
+  Card Card[]
 }
 
 model TypeAccount {
   id             String @id @default(uuid())
   type           String @map("type")
 
-  UserBankingAccount BankAccount[] @relation("AccountType")
+  BankAccount  BankAccount[] @relation("AccountType")
 
   @@map("type_account")
 }
@@ -60,13 +61,15 @@ model TypeAccount {
 model Card {
   id              String   @id @default(uuid())
   userId          String   @map("user_id")
+  accountId       String?   @map("account_id") 
   cardName        String   @map("card_name")
   cardType        CardType
-  limitAmount     Decimal? @map("limit_amount") 
-  currentBalance  Decimal  @default(0.00) @map("current_balance")
+  limitAmount     Decimal? @map("limit_amount") @db.Decimal(15,2)
+  currentBalance  Decimal  @default(0.00) @map("current_balance") @db.Decimal(15,2)
   dueDate         Int?     @map("due_date") 
 
-  user User @relation(fields: [userId], references: [id])
+  user    User          @relation(fields: [userId], references: [id])
+  account BankAccount?  @relation(fields: [accountId], references: [id])
   Transaction Transaction[]
 
   @@map("card")
@@ -82,8 +85,8 @@ model FinancialGoal {
   userId        String   @map("user_id")
   title         String
   description   String?
-  targetAmount  Decimal  @map("target_amount")
-  currentAmount Decimal  @default(0.00) @map("current_amount")
+  targetAmount  Decimal  @map("target_amount") @db.Decimal(15,2)
+  currentAmount Decimal  @default(0.00) @map("current_amount") @db.Decimal(15,2)
   deadline      DateTime?
 
   user User @relation(fields: [userId], references: [id])
@@ -97,7 +100,7 @@ model Transaction {
   userId          String   @map("user_id")
   accountId       String?  @map("account_id")
   cardId          String?  @map("card_id")
-  amount          Decimal
+  amount          Decimal  @db.Decimal(15,2)
   type            TransactionType
   description     String?
   date            DateTime @default(now())
