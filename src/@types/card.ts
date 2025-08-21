@@ -12,3 +12,14 @@ export enum CardType {
   CREDIT = 'CREDIT',
   DEBIT = 'DEBIT',
 }
+
+export type FindCardByAccountIdAndTypeProps = {
+  accountId: string
+  cardType: CardType
+}
+
+export type DeleteCardProps = {
+  userId: string
+  cardId: string
+  cardType: CardType
+}

@@ -7,72 +7,100 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum TypeGender {
-  MALE 
-  FEMALE
-}
-
 model User {
-  id            String @id @default(uuid())
+  id            String          @id @default(uuid())
   name          String
-  email         String      @unique
+  email         String          @unique
   password_hash String
   date_birth    DateTime
   gender        TypeGender
-  created_at    DateTime    @default(now())
-
-  BankAccount BankAccount[] @relation("UserAccounts")
-
-  Card Card[]
-
+  created_at    DateTime        @default(now())
+  BankAccount   BankAccount[]   @relation("UserAccounts")
+  Card          Card[]
   FinancialGoal FinancialGoal[]
-
-  Transaction Transaction[]
+  Transaction   Transaction[]
 
   @@map("user")
 }
 
 model BankAccount {
-  id            String @id @default(uuid())
-  userId        String @map("user_id")
-  accountName   String @map("name_account")
-  accountType   String @map("type_account")
-  bankBalance   Decimal  @map("bank_balance") @db.Decimal(15,2)
-
-
-  user User @relation("UserAccounts", fields: [userId], references: [id])
-  typeAccount TypeAccount @relation("AccountType", fields: [accountType], references: [id])
+  id          String        @id @default(uuid())
+  userId      String        @map("user_id")
+  accountName String        @map("name_account")
+  accountType String        @map("type_account")
+  bankBalance Decimal       @map("bank_balance") @db.Decimal(15, 2)
+  typeAccount TypeAccount   @relation("AccountType", fields: [accountType], references: [id])
+  user        User          @relation("UserAccounts", fields: [userId], references: [id])
+  Card        Card[]
   Transaction Transaction[]
 
+  @@index([accountType], map: "bank_account_type_account_fkey")
+  @@index([userId], map: "bank_account_user_id_fkey")
   @@map("bank_account")
-  Card Card[]
 }
 
 model TypeAccount {
-  id             String @id @default(uuid())
-  type           String @map("type")
-
-  BankAccount  BankAccount[] @relation("AccountType")
+  id          String        @id @default(uuid())
+  type        String        @map("type")
+  BankAccount BankAccount[] @relation("AccountType")
 
   @@map("type_account")
 }
 
-
 model Card {
-  id              String   @id @default(uuid())
-  userId          String   @map("user_id")
-  accountId       String?   @map("account_id") 
-  cardName        String   @map("card_name")
-  cardType        CardType
-  limitAmount     Decimal? @map("limit_amount") @db.Decimal(15,2)
-  currentBalance  Decimal  @default(0.00) @map("current_balance") @db.Decimal(15,2)
-  dueDate         Int?     @map("due_date") 
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
+  cardName       String        @map("card_name")
+  cardType       CardType
+  limitAmount    Decimal?      @map("limit_amount") @db.Decimal(15, 2)
+  currentBalance Decimal       @default(0.00) @map("current_balance") @db.Decimal(15, 2)
+  dueDate        Int?          @map("due_date")
+  accountId      String?       @map("account_id")
+  account        BankAccount?  @relation(fields: [accountId], references: [id])
+  user           User          @relation(fields: [userId], references: [id])
+  Transaction    Transaction[]
 
-  user    User          @relation(fields: [userId], references: [id])
-  account BankAccount?  @relation(fields: [accountId], references: [id])
-  Transaction Transaction[]
-
+  @@index([accountId], map: "card_account_id_fkey")
+  @@index([userId], map: "card_user_id_fkey")
   @@map("card")
+}
+
+model FinancialGoal {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  title         String
+  description   String?
+  targetAmount  Decimal   @map("target_amount") @db.Decimal(15, 2)
+  currentAmount Decimal   @default(0.00) @map("current_amount") @db.Decimal(15, 2)
+  deadline      DateTime?
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "financial_goal_user_id_fkey")
+  @@map("financial_goal")
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  userId      String          @map("user_id")
+  accountId   String?         @map("account_id")
+  cardId      String?         @map("card_id")
+  amount      Decimal         @db.Decimal(15, 2)
+  type        TransactionType
+  description String?
+  date        DateTime        @default(now())
+  account     BankAccount?    @relation(fields: [accountId], references: [id])
+  card        Card?           @relation(fields: [cardId], references: [id])
+  user        User            @relation(fields: [userId], references: [id])
+
+  @@index([accountId], map: "transaction_account_id_fkey")
+  @@index([cardId], map: "transaction_card_id_fkey")
+  @@index([userId], map: "transaction_user_id_fkey")
+  @@map("transaction")
+}
+
+enum TypeGender {
+  MALE
+  FEMALE
 }
 
 enum CardType {
@@ -80,39 +108,7 @@ enum CardType {
   DEBIT
 }
 
-model FinancialGoal {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  title         String
-  description   String?
-  targetAmount  Decimal  @map("target_amount") @db.Decimal(15,2)
-  currentAmount Decimal  @default(0.00) @map("current_amount") @db.Decimal(15,2)
-  deadline      DateTime?
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@map("financial_goal")
-}
-
-
-model Transaction {
-  id              String   @id @default(uuid())
-  userId          String   @map("user_id")
-  accountId       String?  @map("account_id")
-  cardId          String?  @map("card_id")
-  amount          Decimal  @db.Decimal(15,2)
-  type            TransactionType
-  description     String?
-  date            DateTime @default(now())
-
-  user    User               @relation(fields: [userId], references: [id])
-  account BankAccount? @relation(fields: [accountId], references: [id])
-  card    Card?              @relation(fields: [cardId], references: [id])
-
-  @@map("transaction")
-}
-
 enum TransactionType {
-  INCOME   
-  EXPENSE  
+  INCOME
+  EXPENSE
 }

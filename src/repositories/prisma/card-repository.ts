@@ -1,6 +1,6 @@
 import { Card } from '@prisma/client'
 import { ICardRepository } from '../i-card-repository'
-import { CreateCardProps } from '@/@types/card'
+import { CreateCardProps, FindCardByAccountIdAndTypeProps } from '@/@types/card'
 import { prisma } from '@/lib/prisma'
 
 class PrismaCardRepository implements ICardRepository {
@@ -14,6 +14,35 @@ class PrismaCardRepository implements ICardRepository {
         limitAmount: data.limitAmount,
         currentBalance: data.currentBalance,
         dueDate: data.dueDate,
+      },
+    })
+    return card
+  }
+
+  async deleteCard(cardId: string) {
+    await prisma.card.delete({
+      where: {
+        id: cardId,
+      },
+    })
+  }
+
+  async findCardByAccountIdAndType(
+    data: FindCardByAccountIdAndTypeProps
+  ): Promise<Card | null> {
+    const card = await prisma.card.findFirst({
+      where: {
+        accountId: data.accountId,
+        cardType: data.cardType,
+      },
+    })
+    return card
+  }
+
+  async findCardById(cardId: string): Promise<Card | null> {
+    const card = await prisma.card.findUnique({
+      where: {
+        id: cardId,
       },
     })
     return card

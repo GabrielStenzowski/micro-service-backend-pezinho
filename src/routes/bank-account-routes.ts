@@ -4,7 +4,7 @@ import { FastifyInstance } from 'fastify'
 
 const createBankAccountController = new CreateBankAccountController()
 const deleteBankAccountController = new DeleteBankAccountController()
-export async function BankAccountRoutes(app: FastifyInstance) {
+export async function bankAccountRoutes(app: FastifyInstance) {
   app.post('/account/create', createBankAccountController.handle)
   app.delete('/account/delete', deleteBankAccountController.handle)
 }
