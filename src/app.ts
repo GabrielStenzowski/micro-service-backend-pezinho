@@ -4,10 +4,11 @@ import { userRoutes } from './routes/users.routes'
 import { healthRoute } from './routes/test-health.routes'
 import { authenticateUserRoutes } from './routes/authenticate-user.routes'
 
-import { bankAccountRoutes } from './routes/bank-account-routes'
+import { bankAccountRoutes } from './routes/bank-account.routes'
 import { ensureAuthenticated } from './middlewares/ensure-authenticated'
 import { env } from './env'
-import { cardRoutes } from './routes/card-routes'
+import { cardRoutes } from './routes/card.routes'
+import { goalRoutes } from './routes/goal.routes'
 
 const app = fastify()
 
@@ -30,6 +31,7 @@ app.register(async (protectedRoutes) => {
   protectedRoutes.addHook('preHandler', ensureAuthenticated)
   protectedRoutes.register(bankAccountRoutes)
   protectedRoutes.register(cardRoutes)
+  protectedRoutes.register(goalRoutes)
 })
 
 export { app }
